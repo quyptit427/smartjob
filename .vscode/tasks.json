@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run SmartJob Docker stack",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"SmartJob-main\\docker-compose.yml",
+				"up",
+				"-d",
+				"--build"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

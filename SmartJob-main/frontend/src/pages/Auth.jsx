@@ -135,6 +135,7 @@ export default function Auth({ register = false }) {
             required
             maxLength={254}
             placeholder="ban@example.com"
+            spellCheck={false}
           />
           <label className="field">
             <span>Mật khẩu</span>

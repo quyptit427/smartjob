@@ -3,24 +3,24 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  Code2,
   MapPin,
   Search,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
   Target,
-  TrendingUp,
   UsersRound,
 } from 'lucide-react';
 import { useResource } from '../hooks/useResource.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Resource, MatchBanner } from '../components/UI.jsx';
 import JobCard from '../components/JobCard.jsx';
+
 export default function Home() {
   const jobs = useResource('/jobs?limit=6');
   const { user } = useAuth();
   const navigate = useNavigate();
+
   function search(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -28,81 +28,46 @@ export default function Home() {
     for (const [key, value] of form) if (value.trim()) params.set(key, value.trim());
     navigate(`/jobs?${params}`);
   }
+
   return (
     <>
       <section className="hero">
         <div className="container hero-inner">
           <div className="hero-copy">
             <div className="hero-eyebrow">
-              <span className="live-dot" /> MỖI KỸ NĂNG, MỘT CƠ HỘI MỚI
+              <span className="live-dot" aria-hidden="true" /> MỖI KỸ NĂNG, MỘT CƠ HỘI MỚI
             </div>
             <h1>
               Công việc phù hợp.
               <br />
               <span>Tương lai rộng mở.</span>
-              <svg viewBox="0 0 400 20" aria-hidden="true">
-                <path d="M3 13 Q180 -5 395 9" />
-              </svg>
             </h1>
             <p>
-              Đừng chỉ tìm một công việc. Hãy tìm nơi bạn có thể tỏa sáng.
-              <br className="desktop-break" /> SmartJob kết nối bạn với cơ hội phù hợp với chính
-              mình.
+              Đừng chỉ tìm một công việc. Hãy tìm nơi bạn có thể tỏa sáng. SmartJob kết nối bạn với
+              cơ hội phù hợp với chính mình.
             </p>
             <div className="hero-trust">
               <span>
-                <ShieldCheck size={16} /> Cơ hội minh bạch
+                <ShieldCheck size={16} aria-hidden="true" /> Cơ hội minh bạch
               </span>
               <span>
-                <Sparkles size={16} /> Gợi ý theo hồ sơ
+                <Sparkles size={16} aria-hidden="true" /> Gợi ý theo hồ sơ
               </span>
               <span>
-                <Check size={16} /> Hoàn toàn miễn phí
+                <Check size={16} aria-hidden="true" /> Hoàn toàn miễn phí
               </span>
             </div>
           </div>
-          <div
-            className="hero-visual"
-            aria-label="Gợi ý theo kỹ năng, vị trí, kinh nghiệm và địa điểm"
-          >
-            <span className="orbit orbit-one" />
-            <span className="orbit orbit-two" />
-            <span className="visual-spark spark-one">✦</span>
-            <span className="visual-spark spark-two">✧</span>
-            <div className="floating-label">
-              <span className="mini-icon">
-                <Target size={18} />
-              </span>{' '}
-              Đúng người, đúng cơ hội <Check size={14} />
-            </div>
+
+          <div className="hero-visual" aria-label="Cách SmartJob gợi ý việc làm">
             <div className="match-preview">
               <div className="preview-head">
-                <span className="mini-icon">
-                  <Sparkles size={20} />
+                <span className="mini-icon" aria-hidden="true">
+                  <Sparkles size={18} />
                 </span>
                 <div>
                   <strong>Khám phá độ phù hợp</strong>
-                  <small>Hiểu bạn từ những điều quan trọng</small>
-                </div>
-                <span className="preview-dot">•••</span>
-              </div>
-              <div className="score-visual">
-                <div className="score-ring">
-                  <div>
-                    <span>4</span>
-                    <small>yếu tố kết nối</small>
-                  </div>
-                </div>
-                <div className="score-caption">
-                  <span className="eyebrow">CƠ HỘI CỦA RIÊNG BẠN</span>
-                  <strong>
-                    Mỗi hồ sơ,
-                    <br />
-                    một hành trình.
-                  </strong>
-                  <span className="personalized">
-                    <span className="live-dot" /> Cá nhân hóa gợi ý
-                  </span>
+                  <small>Bốn yếu tố kết nối hồ sơ với tin tuyển dụng</small>
                 </div>
               </div>
               <div className="weight-grid">
@@ -124,33 +89,25 @@ export default function Home() {
                 ))}
               </div>
               <div className="preview-bottom">
-                <ShieldCheck size={14} /> Thuật toán rõ ràng. Gợi ý có giải thích.
+                <ShieldCheck size={14} aria-hidden="true" /> Thuật toán rõ ràng. Gợi ý có giải thích.
               </div>
-            </div>
-            <div className="visual-bottom-note">
-              <span className="mini-icon">
-                <TrendingUp size={20} />
-              </span>
-              <div>
-                <strong>Phù hợp hơn, tiến xa hơn</strong>
-                <small>Bắt đầu từ những kỹ năng của bạn</small>
-              </div>
-              <ArrowUpRight size={19} />
             </div>
           </div>
         </div>
+
         <div className="container search-wrap">
           <form className="hero-search" onSubmit={search}>
             <div className="search-input">
-              <Search size={21} />
+              <Search size={20} aria-hidden="true" />
               <input
                 name="q"
                 aria-label="Từ khóa việc làm"
                 placeholder="Vị trí, kỹ năng hoặc tên công ty…"
+                autoComplete="off"
               />
             </div>
             <div className="search-location">
-              <MapPin size={21} />
+              <MapPin size={20} aria-hidden="true" />
               <select name="location" aria-label="Địa điểm làm việc">
                 <option value="">Tất cả địa điểm</option>
                 <option>Hà Nội</option>
@@ -160,7 +117,7 @@ export default function Home() {
               </select>
             </div>
             <button className="btn btn-primary" type="submit">
-              <Search size={19} /> Tìm việc ngay
+              <Search size={18} aria-hidden="true" /> Tìm việc ngay
             </button>
           </form>
           <div className="popular-search">
@@ -168,17 +125,18 @@ export default function Home() {
             {['Frontend', 'Backend', 'React', 'Thực tập'].map((q) => (
               <Link key={q} to={`/jobs?q=${encodeURIComponent(q)}`}>
                 {q}
-                <ArrowUpRight size={12} />
+                <ArrowUpRight size={12} aria-hidden="true" />
               </Link>
             ))}
           </div>
         </div>
       </section>
+
       <section className="intro-strip">
         <div className="container intro-grid">
           <div>
-            <span className="strip-icon">
-              <Target size={22} />
+            <span className="strip-icon" aria-hidden="true">
+              <Target size={20} />
             </span>
             <div>
               <strong>Tìm đúng cơ hội</strong>
@@ -186,8 +144,8 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <span className="strip-icon">
-              <SlidersHorizontal size={22} />
+            <span className="strip-icon" aria-hidden="true">
+              <SlidersHorizontal size={20} />
             </span>
             <div>
               <strong>Chủ động lựa chọn</strong>
@@ -195,8 +153,8 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <span className="strip-icon">
-              <UsersRound size={22} />
+            <span className="strip-icon" aria-hidden="true">
+              <UsersRound size={20} />
             </span>
             <div>
               <strong>Kết nối dễ dàng</strong>
@@ -205,6 +163,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       <section className="section container">
         <div className="section-heading">
           <div>
@@ -215,7 +174,7 @@ export default function Home() {
             <p>Khám phá những vị trí đang chờ một người như bạn.</p>
           </div>
           <Link className="text-link" to="/jobs">
-            Xem tất cả việc làm <ArrowRight size={17} />
+            Xem tất cả việc làm <ArrowRight size={17} aria-hidden="true" />
           </Link>
         </div>
         <Resource
@@ -232,23 +191,23 @@ export default function Home() {
           )}
         </Resource>
       </section>
+
       <section className="container">
         <MatchBanner />
       </section>
+
       <section className="section container journey-section">
         <div>
           <span className="eyebrow">ĐƠN GIẢN ĐỂ BẮT ĐẦU</span>
           <h2>
-            Chạm đến công việc mới <br />
+            Chạm đến công việc mới
+            <br />
             trong ba bước.
           </h2>
-          <p>
-            Để thời gian của bạn dành cho điều quan trọng:
-            <br />
-            chuẩn bị cho một khởi đầu tốt hơn.
-          </p>
+          <p>Để thời gian của bạn dành cho điều quan trọng: chuẩn bị cho một khởi đầu tốt hơn.</p>
           <Link className="text-link" to={user ? '/profile' : '/register'}>
-            {user ? 'Hoàn thiện hồ sơ' : 'Tạo hồ sơ miễn phí'} <ArrowRight size={17} />
+            {user ? 'Hoàn thiện hồ sơ' : 'Tạo hồ sơ miễn phí'}{' '}
+            <ArrowRight size={17} aria-hidden="true" />
           </Link>
         </div>
         <div className="journey-steps">
@@ -271,7 +230,6 @@ export default function Home() {
                 <h3>{title}</h3>
                 <p>{desc}</p>
               </div>
-              <ArrowUpRight size={19} />
             </div>
           ))}
         </div>

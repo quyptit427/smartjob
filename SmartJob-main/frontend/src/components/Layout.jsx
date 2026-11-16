@@ -29,6 +29,9 @@ export default function Layout() {
   }
   return (
     <>
+      <a className="skip-link" href="#main-content">
+        Bỏ qua điều hướng
+      </a>
       <header className="site-header">
         <div className="container header-inner">
           <Logo />
@@ -95,7 +98,7 @@ export default function Layout() {
           </div>
         </div>
       </header>
-      <main>
+      <main id="main-content">
         <Outlet />
       </main>
       <footer className="site-footer">

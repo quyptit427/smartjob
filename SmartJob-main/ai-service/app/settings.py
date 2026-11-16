@@ -14,11 +14,14 @@ class Settings:
     internal_service_token = os.getenv("INTERNAL_SERVICE_TOKEN", "")
     job_service_url = os.getenv("JOB_SERVICE_URL", "http://127.0.0.1:3002").rstrip("/")
     resume_service_url = os.getenv("RESUME_SERVICE_URL", "http://127.0.0.1:3005").rstrip("/")
-    qwen_api_base_url = os.getenv(
-        "QWEN_API_BASE_URL", "http://localhost:11434/v1"
+    openai_api_base_url = os.getenv(
+        "OPENAI_API_BASE_URL", "https://api.xingchiapi.com/v1"
     ).rstrip("/")
-    qwen_chat_model = os.getenv("QWEN_CHAT_MODEL", "qwen3:4b")
-    embedding_model = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
+    openai_api_key = os.getenv("OPENAI_API_KEY", "")
+    openai_chat_model = os.getenv("OPENAI_CHAT_MODEL", "gpt-6.1-sol")
+    openai_embedding_model = os.getenv(
+        "OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"
+    )
 
 
 settings = Settings()

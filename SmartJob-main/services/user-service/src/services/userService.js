@@ -31,7 +31,20 @@ export async function updateProfile(id, input) {
   // Role, email and password cannot be reassigned through a profile update.
   const allowed =
     user.role === 'CANDIDATE'
-      ? ['name', 'skills', 'experienceYears', 'desiredPosition', 'location', 'phone', 'bio']
+      ? [
+          'name',
+          'skills',
+          'experienceYears',
+          'desiredPosition',
+          'location',
+          'phone',
+          'bio',
+          'education',
+          'workExperience',
+          'certifications',
+          'languages',
+          'links',
+        ]
       : ['name', 'companyName', 'location', 'phone', 'bio'];
   for (const key of allowed) if (input[key] !== undefined) user[key] = input[key];
   await user.save();

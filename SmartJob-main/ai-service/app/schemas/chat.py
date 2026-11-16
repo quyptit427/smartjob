@@ -61,3 +61,53 @@ class AdviceRecommendation(BaseModel):
 class AdviceResult(BaseModel):
     answer: str
     recommendations: list[AdviceRecommendation]
+
+
+class AdvisorBundle(BaseModel):
+    profile: CvProfile
+    answer: str
+    recommendations: list[AdviceRecommendation]
+
+
+class EducationItem(BaseModel):
+    school: str = ""
+    degree: str = ""
+    field: str = ""
+    period: str = ""
+
+
+class WorkExperienceItem(BaseModel):
+    title: str = ""
+    company: str = ""
+    period: str = ""
+    description: str = ""
+
+
+class LanguageItem(BaseModel):
+    name: str = ""
+    level: str = ""
+
+
+class ProfileLinks(BaseModel):
+    linkedin: str | None = None
+    github: str | None = None
+    portfolio: str | None = None
+
+
+class ExtractedProfile(BaseModel):
+    name: str | None = None
+    phone: str | None = None
+    location: str | None = None
+    experience_years: float | None = None
+    desired_position: str | None = None
+    skills: list[str] = Field(default_factory=list)
+    bio: str | None = None
+    education: list[EducationItem] = Field(default_factory=list)
+    work_experience: list[WorkExperienceItem] = Field(default_factory=list)
+    certifications: list[str] = Field(default_factory=list)
+    languages: list[LanguageItem] = Field(default_factory=list)
+    links: ProfileLinks = Field(default_factory=ProfileLinks)
+
+
+class ExtractProfileEnvelope(BaseModel):
+    data: ExtractedProfile

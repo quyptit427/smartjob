@@ -14,11 +14,15 @@ export function ToastProvider({ children }) {
     <Context.Provider value={notify}>
       {children}
       {toast && (
-        <div className={`toast ${toast.type}`} role="status">
-          {toast.type === 'success' ? <CheckCircle2 size={20} /> : <CircleAlert size={20} />}
+        <div className={`toast ${toast.type}`} role="status" aria-live="polite">
+          {toast.type === 'success' ? (
+            <CheckCircle2 size={15} aria-hidden="true" />
+          ) : (
+            <CircleAlert size={15} aria-hidden="true" />
+          )}
           <span>{toast.message}</span>
           <button aria-label="Đóng thông báo" onClick={() => setToast(null)}>
-            <X size={18} />
+            <X size={14} aria-hidden="true" />
           </button>
         </div>
       )}

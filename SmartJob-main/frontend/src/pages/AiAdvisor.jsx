@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BrainCircuit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import JobCard from '../components/JobCard.jsx';
@@ -8,6 +8,7 @@ import { api, errorMessage } from '../lib/api.js';
 
 export default function AiAdvisor() {
   const toast = useToast();
+  const resultsRef = useRef(null);
   const [message, setMessage] = useState('Phân tích CV và gợi ý các công việc phù hợp với tôi.');
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -15,6 +16,7 @@ export default function AiAdvisor() {
   const [cvName, setCvName] = useState('CV của bạn');
   const [cvLoading, setCvLoading] = useState(true);
   const [cvError, setCvError] = useState('');
+  const [cvOpen, setCvOpen] = useState(true);
   const highPriority = result?.recommendations.filter((item) => item.priority === 'high') || [];
   const relatedJobs = result?.recommendations.filter((item) => item.priority === 'related') || [];
 
@@ -66,7 +68,20 @@ export default function AiAdvisor() {
     setBusy(true);
     try {
       const response = await api.post('/ai/chat', { message }, { timeout: 180000 });
-      setResult(response.data.data);
+      const data = response.data.data;
+      setResult(data);
+      const total = data.recommendations?.length || 0;
+      toast(
+        total
+          ? `Phân tích xong — tìm thấy ${total} công việc phù hợp.`
+          : 'Phân tích xong. Chưa có tin tuyển dụng phù hợp.',
+      );
+      // Wait for results to mount, then scroll to job suggestions.
+      requestAnimationFrame(() => {
+        window.setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      });
     } catch (error) {
       toast(errorMessage(error), 'error');
     } finally {
@@ -95,7 +110,11 @@ export default function AiAdvisor() {
           />
         </label>
         <div className="ai-chat-actions">
-          <small>CV được phân tích bằng Qwen3-4B chạy cục bộ trên máy.</small>
+          <small>
+            {busy
+              ? 'Đang phân tích — thường 20–45 giây, vui lòng chờ…'
+              : 'CV được phân tích bằng mô hình AI qua API OpenAI-compatible.'}
+          </small>
           <button className="btn btn-primary" disabled={busy}>
             <BrainCircuit size={17} /> {busy ? 'Đang phân tích CV…' : 'Phân tích và gợi ý'}
           </button>
@@ -108,21 +127,45 @@ export default function AiAdvisor() {
             <h2>CV đã tải lên</h2>
             <p>{cvName}</p>
           </div>
-          <Link className="btn btn-secondary" to="/profile">Quản lý CV</Link>
-        </div>
-        {cvLoading ? (
-          <div className="state-box"><p>Đang tải bản xem trước CV…</p></div>
-        ) : cvPreview ? (
-          <iframe className="ai-cv-preview-frame" src={cvPreview} title="Bản xem trước CV PDF" />
-        ) : (
-          <div className="state-box">
-            <p>{cvError || 'Bạn chưa tải CV lên. Tải CV PDF lên hồ sơ để xem tại đây và nhận gợi ý.'}</p>
+          <div className="ai-cv-preview-actions">
+            <button
+              type="button"
+              className="btn btn-secondary btn-small"
+              aria-expanded={cvOpen}
+              onClick={() => setCvOpen((open) => !open)}
+            >
+              {cvOpen ? 'Thu gọn' : 'Xem CV'}
+            </button>
+            <Link className="btn btn-secondary btn-small" to="/profile">
+              Quản lý CV
+            </Link>
           </div>
-        )}
+        </div>
+        {cvOpen &&
+          (cvLoading ? (
+            <div className="state-box">
+              <p>Đang tải bản xem trước CV…</p>
+            </div>
+          ) : cvPreview ? (
+            <iframe className="ai-cv-preview-frame" src={cvPreview} title="Bản xem trước CV PDF" />
+          ) : (
+            <div className="state-box">
+              <p>
+                {cvError ||
+                  'Bạn chưa tải CV lên. Tải CV PDF lên hồ sơ để xem tại đây và nhận gợi ý.'}
+              </p>
+            </div>
+          ))}
       </section>
 
       {result && (
-        <div className="ai-results">
+        <div className="ai-results" id="ai-job-suggestions" ref={resultsRef} tabIndex={-1}>
+          {result.answer && (
+            <section className="panel ai-answer-panel">
+              <h2>Lời tư vấn từ AI</h2>
+              <p>{result.answer}</p>
+            </section>
+          )}
           <div className="results-heading">
             <h2>{result.recommendations.length} công việc được tìm thấy</h2>
             <span>Chia theo mức độ khớp trực tiếp với CV</span>

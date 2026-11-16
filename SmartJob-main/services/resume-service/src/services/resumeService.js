@@ -5,6 +5,21 @@ import { ApiError } from '@smartjob/shared/errors';
 import { Resume } from '../models/Resume.js';
 
 const MAX_SIZE = 5 * 1024 * 1024;
+// Acrobat accepts %PDF- anywhere in the first 1024 bytes (leading junk / BOM).
+const isPdfBuffer = (body) => {
+  const end = Math.min(body.length, 1024);
+  for (let i = 0; i <= end - 5; i += 1) {
+    if (
+      body[i] === 0x25 &&
+      body[i + 1] === 0x50 &&
+      body[i + 2] === 0x44 &&
+      body[i + 3] === 0x46 &&
+      body[i + 4] === 0x2d
+    )
+      return true;
+  }
+  return false;
+};
 const safeName = (value) => {
   let decoded = String(value || 'cv.pdf');
   try { decoded = decodeURIComponent(decoded); } catch {}
@@ -31,8 +46,12 @@ export async function uploadResume(userId, body, originalName, storageDir) {
     throw new ApiError(400, 'Vui lòng chọn file PDF.', 'RESUME_REQUIRED');
   if (body.length > MAX_SIZE)
     throw new ApiError(413, 'CV không được vượt quá 5 MB.', 'PAYLOAD_TOO_LARGE');
-  if (body.subarray(0, 5).toString('ascii') !== '%PDF-')
-    throw new ApiError(400, 'File tải lên không phải PDF hợp lệ.', 'INVALID_PDF');
+  if (!isPdfBuffer(body))
+    throw new ApiError(
+      400,
+      'File tải lên không phải PDF hợp lệ. Hãy xuất/Save as PDF — không chỉ đổi đuôi .pdf.',
+      'INVALID_PDF',
+    );
 
   await mkdir(storageDir, { recursive: true });
   const storedName = `${randomUUID()}.pdf`;

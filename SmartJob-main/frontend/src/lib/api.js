@@ -16,11 +16,32 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+const readErrorPayload = (data) => {
+  if (!data) return null;
+  if (typeof data === 'string') {
+    try {
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  }
+  if (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer) {
+    try {
+      return JSON.parse(new TextDecoder().decode(data));
+    } catch {
+      return null;
+    }
+  }
+  if (typeof data === 'object' && data.error) return data;
+  return null;
+};
+
 export const errorMessage = (error) => {
-  const details = error?.response?.data?.error?.details;
+  const payload = readErrorPayload(error?.response?.data);
+  const details = payload?.error?.details;
   return details?.length
     ? details.map((d) => `${d.field}: ${d.message}`).join(' • ')
-    : error?.response?.data?.error?.message ||
+    : payload?.error?.message ||
         'Không thể kết nối máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
 };
 export const salary = (job) =>

@@ -22,6 +22,11 @@ export async function apply(candidateId, input) {
       desiredPosition: candidate.desiredPosition,
       location: candidate.location,
       bio: candidate.bio,
+      education: candidate.education || [],
+      workExperience: candidate.workExperience || [],
+      certifications: candidate.certifications || [],
+      languages: candidate.languages || [],
+      links: candidate.links || {},
     },
   });
 }

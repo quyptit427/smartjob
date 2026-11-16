@@ -2,7 +2,7 @@ import asyncio
 import hashlib
 from collections.abc import Sequence
 
-from app.services.qwen_client import create_embeddings
+from app.services.openai_client import create_embeddings
 
 _job_embedding_cache: dict[str, list[float]] = {}
 

@@ -159,11 +159,10 @@ services:
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN}
       JOB_SERVICE_URL: http://job-service:3002
       RESUME_SERVICE_URL: http://resume-service:3005
-      QWEN_API_BASE_URL: http://host.docker.internal:11434/v1
-      QWEN_CHAT_MODEL: ${QWEN_CHAT_MODEL:-qwen3:4b}
-      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-nomic-embed-text}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      OPENAI_API_BASE_URL: ${OPENAI_API_BASE_URL:-https://api.xingchiapi.com/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-6.1-sol}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
     restart: unless-stopped
     depends_on:
       job-service:

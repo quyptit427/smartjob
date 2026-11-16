@@ -20,6 +20,29 @@ const schema = new mongoose.Schema(
       desiredPosition: String,
       location: String,
       bio: String,
+      education: [
+        {
+          school: String,
+          degree: String,
+          field: String,
+          period: String,
+        },
+      ],
+      workExperience: [
+        {
+          title: String,
+          company: String,
+          period: String,
+          description: String,
+        },
+      ],
+      certifications: [String],
+      languages: [{ name: String, level: String }],
+      links: {
+        linkedin: String,
+        github: String,
+        portfolio: String,
+      },
     },
   },
   { timestamps: true },

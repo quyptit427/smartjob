@@ -104,9 +104,9 @@ Cập nhật từng phần, không cần gửi lại mọi trường:
 }
 ```
 
-Ứng viên được cập nhật `name, skills, experienceYears, desiredPosition, location, phone, bio`. Recruiter được cập nhật `name, companyName, location, phone, bio`; các trường nghiệp vụ của vai trò khác bị bỏ qua. Không cho đổi email/role/password qua endpoint này.
+Ứng viên được cập nhật `name, skills, experienceYears, desiredPosition, location, phone, bio, education, workExperience, certifications, languages, links`. Recruiter được cập nhật `name, companyName, location, phone, bio`; các trường nghiệp vụ của vai trò khác bị bỏ qua. Không cho đổi email/role/password qua endpoint này.
 
-Kỹ năng: tối đa 40 phần tử, mỗi phần tử 1–60 ký tự, trim/lowercase, loại trùng. Vị trí/địa điểm/tên công ty tối đa 150, phone tối đa 30, bio tối đa 3000. Trả hồ sơ sau cập nhật.
+Kỹ năng: tối đa 40 phần tử, mỗi phần tử 1–60 ký tự, trim/lowercase, loại trùng. Vị trí/địa điểm/tên công ty tối đa 150, phone tối đa 30, bio tối đa 3000. `education` tối đa 10 mục, `workExperience` tối đa 15, `certifications` tối đa 20, `languages` tối đa 12, `links` gồm `linkedin/github/portfolio`. Trả hồ sơ sau cập nhật.
 
 Đăng xuất thực hiện phía client bằng cách xóa token; không có endpoint logout và không thu hồi token đã phát hành trước thời hạn.
 
@@ -258,9 +258,11 @@ Thiếu/sai token trả `401 SERVICE_UNAUTHORIZED`; ID sai `400`; không tồn t
 
 ## AI Service
 
-`POST /api/ai/chat` — chỉ ứng viên đã đăng nhập. Body JSON `{ "message": "Tôi muốn tìm vị trí React tại Hà Nội." }`; có thể gửi `{}` để nhận gợi ý mặc định. `message` dài tối đa 1200 ký tự. AI Service lấy CV hiện tại qua Resume Service nội bộ, phân tích CV, dùng embedding để truy xuất tối đa 8 tin đang mở liên quan, rồi trả lời bằng tiếng Việt.
+`POST /api/ai/extract-profile` — chỉ ứng viên đã đăng nhập, không cần body. Đọc CV PDF hiện tại, trích xuất và trả `{ data }` gồm các trường điền hồ sơ: `name`, `phone`, `location`, `experience_years`, `desired_position`, `skills`, `bio`, `education[]`, `work_experience[]`, `certifications[]`, `languages[]`, `links`. Frontend dùng endpoint này để autofill form hồ sơ sau khi tải CV. Thiếu CV trả `404`.
 
-Response `200 { "data": { "answer", "profile", "recommendations": [] } }`. Each recommendation includes `priority` (`high` for direct role-and-skill matches, `related` for semantically related jobs), `job`, `similarity`, `reason`, and `skill_gaps`. The CV profile includes `experience_roles` (titles found in work history) and `target_roles`. AI uses local Ollama with Qwen3-4B and `nomic-embed-text`; no API key is needed. CV PDF text is extracted locally. If no CV is uploaded, the API returns `404`.
+`POST /api/ai/chat` — chỉ ứng viên đã đăng nhập. Body JSON `{ "message": "Tôi muốn tìm vị trí React tại Hà Nội." }`; có thể gửi `{}` để nhận gợi ý mặc định. `message` dài tối đa 1200 ký tự. AI Service lấy CV hiện tại qua Resume Service nội bộ, phân tích CV, truy xuất tin đang mở liên quan, rồi trả lời bằng tiếng Việt.
+
+Response `200 { "data": { "answer", "profile", "recommendations": [] } }`. Mỗi recommendation gồm `priority` (`high` / `related`), `job`, `similarity`, `reason`, `skill_gaps`. Profile tư vấn gồm `experience_roles` và `target_roles`. Độ ưu tiên AI Advisor căn theo công thức recommendation 40/25/20/15. Thiếu CV trả `404`.
 
 ## Resume Service
 

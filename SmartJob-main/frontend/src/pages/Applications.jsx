@@ -8,8 +8,9 @@ export default function Applications() {
   const [page, setPage] = useState(1);
   const resource = useResource(`/applications/me?page=${page}&limit=10`);
   return (
-    <div className="container page-shell">
+    <div className="page-shell">
       <PageHeading
+        band
         eyebrow="HÀNH TRÌNH ỨNG TUYỂN"
         title="Những cơ hội bạn đã chọn."
         description="Theo dõi hồ sơ và từng bước tiến trên hành trình nghề nghiệp."
@@ -19,6 +20,7 @@ export default function Applications() {
           </Link>
         }
       />
+      <div className="container page-body">
       <Resource
         resource={resource}
         emptyTitle="Hành trình ứng tuyển bắt đầu từ đây"
@@ -60,6 +62,7 @@ export default function Applications() {
           </>
         )}
       </Resource>
+      </div>
     </div>
   );
 }

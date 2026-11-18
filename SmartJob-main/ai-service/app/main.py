@@ -119,8 +119,9 @@ async def chat(body: ChatRequest, request: Request):
         matches = await retrieve_jobs(draft_profile, body.message, jobs)
         advice = await analyze_and_advise(cv_text, body.message, matches)
         profile = CvProfile.model_validate(advice["profile"])
-        # Final priority uses LLM profile + same 40/25/20/15 formula as recommendation-service.
-        matches = rescore_matches(profile_from_cv_model(profile), matches)
+        merged_profile = profile_from_cv_model(profile, fallback=draft_profile)
+        # Final priority uses LLM + heuristic profile and same 40/25/20/15 formula as recommendation-service.
+        matches = rescore_matches(merged_profile, matches, all_jobs=jobs)
     except AiProviderError as error:
         if error.status_code == 429:
             raise HTTPException(
@@ -154,10 +155,11 @@ async def chat(body: ChatRequest, request: Request):
         if item.get("job_id") in matches_by_id
     }
     recommendations = []
-    cv_skills = {skill.casefold() for skill in profile.skills}
+    cv_skills = {skill.casefold() for skill in merged_profile.get("skills", [])}
     for job_id, match in matches_by_id.items():
         reason = reasons_by_id.get(job_id, {})
         matched_skills = match.get("matched_skills", [])
+        known_skills = cv_skills | {s.casefold() for s in matched_skills}
         if not reason:
             score = match.get("score", 0)
             breakdown = match.get("breakdown") or {}
@@ -176,16 +178,21 @@ async def chat(body: ChatRequest, request: Request):
             gaps = [
                 skill
                 for skill in match["job"].get("requiredSkills", [])
-                if skill.casefold() not in cv_skills
+                if skill.casefold() not in known_skills
             ]
             reason = {"reason": fallback_reason, "skill_gaps": gaps}
+        filtered_gaps = [
+            skill
+            for skill in reason.get("skill_gaps", [])
+            if skill.casefold() not in known_skills
+        ]
         recommendations.append(
             JobRecommendation(
                 job=JobCard.model_validate(jobs_by_id[job_id]),
                 priority=match["priority"],
                 similarity=round(match["similarity"], 4),
                 reason=reason.get("reason", "Nội dung công việc liên quan đến hồ sơ của bạn."),
-                skill_gaps=reason.get("skill_gaps", []),
+                skill_gaps=filtered_gaps,
             )
         )
 

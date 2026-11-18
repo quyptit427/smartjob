@@ -3,16 +3,14 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import {
   ArrowUpRight,
   BriefcaseBusiness,
-  BrainCircuit,
-  ChevronDown,
   LogOut,
   Menu,
   UserRound,
   X,
-  Zap,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Logo } from './UI.jsx';
+
 export default function Layout() {
   const { user, logout } = useAuth();
   const [menu, setMenu] = useState(false);
@@ -36,37 +34,27 @@ export default function Layout() {
         <div className="container header-inner">
           <Logo />
           <nav className={`main-nav ${menu ? 'is-open' : ''}`} aria-label="Điều hướng chính">
-            <NavLink to="/jobs">Tìm việc làm</NavLink>
-            {!recruiter && (
-              <NavLink to="/recommendations">
-                <Zap size={15} /> Gợi ý cho bạn
-              </NavLink>
-            )}
-            {user?.role === 'CANDIDATE' && (
-              <NavLink to="/ai-advisor">
-                <BrainCircuit size={15} /> Tư vấn AI từ CV
-              </NavLink>
-            )}
+            <NavLink to="/jobs">Việc làm</NavLink>
+            {!recruiter && <NavLink to="/recommendations">Gợi ý</NavLink>}
+            {user?.role === 'CANDIDATE' && <NavLink to="/ai-advisor">Tư vấn AI</NavLink>}
             {user && (
               <NavLink to={recruiter ? '/recruiter' : '/applications'}>
-                {recruiter ? 'Quản lý tuyển dụng' : 'Việc đã ứng tuyển'}
+                {recruiter ? 'Tuyển dụng' : 'Ứng tuyển'}
               </NavLink>
             )}
+            {user && <NavLink to="/profile">Hồ sơ</NavLink>}
             {!user && (
               <Link to="/register?role=RECRUITER">
-                Dành cho nhà tuyển dụng <ArrowUpRight size={14} />
+                Nhà tuyển dụng <ArrowUpRight size={14} />
               </Link>
             )}
           </nav>
           <div className="header-actions">
             {user ? (
               <>
-                <Link className="profile-link" to="/profile">
+                <Link className="profile-link" to="/profile" title={user.name}>
                   <span className="avatar">{user.name.slice(0, 1).toUpperCase()}</span>
-                  <span className="profile-name">
-                    {user.name}
-                    <ChevronDown size={13} />
-                  </span>
+                  <span className="profile-name">{user.name}</span>
                 </Link>
                 <button
                   className="icon-button"
@@ -74,7 +62,7 @@ export default function Layout() {
                   aria-label="Đăng xuất"
                   onClick={signOut}
                 >
-                  <LogOut size={19} />
+                  <LogOut size={18} />
                 </button>
               </>
             ) : (
@@ -83,7 +71,7 @@ export default function Layout() {
                   Đăng nhập
                 </Link>
                 <Link className="btn btn-primary btn-small" to="/register">
-                  Đăng ký ngay <ArrowUpRight size={15} />
+                  Đăng ký
                 </Link>
               </>
             )}
@@ -98,6 +86,7 @@ export default function Layout() {
           </div>
         </div>
       </header>
+
       <main id="main-content">
         <Outlet />
       </main>
@@ -141,9 +130,7 @@ export default function Layout() {
         </div>
         <div className="container footer-bottom">
           <span>© {new Date().getFullYear()} SmartJob. Dự án môn Phát triển hướng dịch vụ.</span>
-          <span>
-            Được xây dựng cho những khởi đầu mới <span className="text-blue-600">✦</span>
-          </span>
+          <span>SmartJob · SOA coursework</span>
         </div>
       </footer>
     </>

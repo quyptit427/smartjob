@@ -11,39 +11,44 @@ export default function JobForm() {
   const resource = useResource(id ? `/jobs/${id}` : null);
   const { user } = useAuth();
   return (
-    <div className="container page-shell narrow">
-      <Link className="back-link" to="/recruiter">
-        <ArrowLeft size={17} /> Quản lý tuyển dụng
-      </Link>
+    <div className="page-shell narrow">
       <PageHeading
+        band
         eyebrow="KẾT NỐI NHÂN TÀI"
         title={id ? 'Chỉnh sửa tin tuyển dụng.' : 'Cơ hội mới cho đồng đội mới.'}
         description="Thông tin rõ ràng giúp bạn tìm thấy những ứng viên phù hợp."
+        action={
+          <Link className="btn btn-secondary" to="/recruiter">
+            <ArrowLeft size={17} /> Quản lý tuyển dụng
+          </Link>
+        }
       />
-      {id ? (
-        <Resource resource={resource}>
-          {(job) =>
-            job.recruiterId === user._id ? (
-              <Editor job={job} />
-            ) : (
-              <ErrorState message="Bạn không sở hữu tin tuyển dụng này." />
-            )
-          }
-        </Resource>
-      ) : (
-        <Editor
-          job={{
-            companyName: user.companyName,
-            location: user.location,
-            requiredSkills: [],
-            status: 'open',
-            jobType: 'FULL_TIME',
-            experienceMin: 0,
-            salaryMin: 0,
-            salaryMax: 0,
-          }}
-        />
-      )}
+      <div className="container page-body">
+        {id ? (
+          <Resource resource={resource}>
+            {(job) =>
+              job.recruiterId === user._id ? (
+                <Editor job={job} />
+              ) : (
+                <ErrorState message="Bạn không sở hữu tin tuyển dụng này." />
+              )
+            }
+          </Resource>
+        ) : (
+          <Editor
+            job={{
+              companyName: user.companyName,
+              location: user.location,
+              requiredSkills: [],
+              status: 'open',
+              jobType: 'FULL_TIME',
+              experienceMin: 0,
+              salaryMin: 0,
+              salaryMax: 0,
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }

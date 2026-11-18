@@ -90,14 +90,17 @@ export default function AiAdvisor() {
   }
 
   return (
-    <div className="container page-shell ai-advisor-page">
+    <div className="page-shell ai-advisor-page">
       <PageHeading
+        band
         eyebrow="CỐ VẤN NGHỀ NGHIỆP AI"
         title="Tìm việc từ chính CV của bạn."
         description="AI phân tích kỹ năng và kinh nghiệm trong CV, sau đó tìm các tin tuyển dụng phù hợp."
         action={<Link className="btn btn-secondary" to="/profile">Quản lý CV</Link>}
       />
-      <form className="panel ai-chat-form" onSubmit={submit}>
+      
+      <div className="container page-body">
+<form className="panel ai-chat-form" onSubmit={submit}>
         <label className="field">
           <span>Bạn muốn được tư vấn điều gì?</span>
           <textarea
@@ -170,7 +173,7 @@ export default function AiAdvisor() {
             <h2>{result.recommendations.length} công việc được tìm thấy</h2>
             <span>Chia theo mức độ khớp trực tiếp với CV</span>
           </div>
-          <section className="ai-priority-group">
+          <section className="ai-priority-group ai-priority-high">
             <div className="results-heading">
               <h2>Ưu tiên cao · Khớp trực tiếp</h2>
               <span>Chức danh trong CV và kỹ năng phù hợp</span>
@@ -181,7 +184,7 @@ export default function AiAdvisor() {
               <div className="state-box"><p>Chưa có tin khớp trực tiếp cả chức danh và kỹ năng trong CV.</p></div>
             )}
           </section>
-          <section className="ai-priority-group">
+          <section className="ai-priority-group ai-priority-low">
             <div className="results-heading">
               <h2>Ưu tiên thấp · Công việc liên quan</h2>
               <span>Kỹ năng hoặc nội dung có điểm tương đồng</span>
@@ -194,6 +197,8 @@ export default function AiAdvisor() {
           </section>
         </div>
       )}
-    </div>
+    
+      </div>
+</div>
   );
 }

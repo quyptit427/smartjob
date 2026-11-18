@@ -30,10 +30,10 @@ def _headers() -> dict[str, str]:
     }
 
 
-def _post(path: str, payload: dict) -> dict:
+def _post(path: str, payload: dict, timeout: float = 45.0) -> dict:
     url = f"{settings.openai_api_base_url}/{path.lstrip('/')}"
     try:
-        with httpx.Client(timeout=120.0) as client:
+        with httpx.Client(timeout=timeout) as client:
             response = client.post(url, headers=_headers(), json=payload)
     except httpx.HTTPError as error:
         raise AiProviderError(
@@ -41,8 +41,15 @@ def _post(path: str, payload: dict) -> dict:
         ) from error
     if response.is_error:
         status_code = response.status_code if response.status_code in (401, 429, 503) else 502
+        detail = response.text[:300]
+        try:
+            err_json = response.json()
+            if isinstance(err_json, dict) and isinstance(err_json.get("error"), dict):
+                detail = err_json["error"].get("message") or detail
+        except Exception:
+            pass
         raise AiProviderError(
-            f"API AI trả lỗi HTTP {response.status_code}: {response.text[:500]}",
+            f"API AI trả lỗi HTTP {response.status_code}: {detail}",
             status_code,
         )
     return response.json()
@@ -60,9 +67,21 @@ def _extract_output_text(response: dict) -> str:
     if content:
         return content
     try:
-        return response["choices"][0]["message"]["content"]
+        msg_content = response["choices"][0]["message"]["content"]
+        if isinstance(msg_content, list):
+            return "\n".join(
+                part.get("text", "") for part in msg_content if isinstance(part, dict)
+            ).strip()
+        return str(msg_content or "").strip()
     except (KeyError, IndexError, TypeError) as error:
         raise ValueError("API AI trả phản hồi không hợp lệ.") from error
+
+
+def _strip_json_fence(content: str) -> str:
+    fence = re.search(r"```(?:json)?\s*([\s\S]*?)```", content, re.IGNORECASE)
+    if fence:
+        return fence.group(1).strip()
+    return content.strip()
 
 
 def generate_json(
@@ -77,28 +96,54 @@ def generate_json(
         if not response_schema
         else f"Trả JSON object hợp lệ, không markdown. Khóa chính: {', '.join(response_schema.keys())}."
     )
+    full_instructions = f"{system_prompt}\n\n{schema_hint}"
     payload = {
         "model": settings.openai_chat_model,
-        "instructions": f"{system_prompt}\n\n{schema_hint}",
+        "instructions": full_instructions,
         "input": user_prompt,
         "store": False,
         "max_output_tokens": max_tokens,
         "temperature": 0.2,
-        # Fastest path on this proxy; falls back if unsupported.
         "reasoning": {"effort": "minimal"},
     }
+    response: dict | None = None
+    last_error: AiProviderError | None = None
+
     try:
         response = _post("responses", payload)
-    except AiProviderError:
-        payload["reasoning"] = {"effort": "low"}
-        response = _post("responses", payload)
+    except AiProviderError as err:
+        last_error = err
+        # Only retry /responses if the model rejected reasoning.effort="minimal" (400/422).
+        if "HTTP 400" in str(err) or "HTTP 422" in str(err):
+            try:
+                payload["reasoning"] = {"effort": "low"}
+                response = _post("responses", payload)
+            except AiProviderError as retry_err:
+                last_error = retry_err
+
+    # Fallback to standard OpenAI /chat/completions if /responses is unsupported or upstream failed.
+    if response is None and (last_error is None or last_error.status_code != 401):
+        chat_payload = {
+            "model": settings.openai_chat_model,
+            "messages": [
+                {"role": "system", "content": full_instructions},
+                {"role": "user", "content": user_prompt},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.2,
+        }
+        try:
+            response = _post("chat/completions", chat_payload)
+        except AiProviderError as chat_err:
+            raise (last_error or chat_err) from chat_err
+
+    if response is None:
+        raise last_error or AiProviderError("API AI chưa xử lý được yêu cầu.")
+
     content = _extract_output_text(response)
     if not content:
         raise ValueError("API AI trả phản hồi rỗng.")
-    fence = re.search(r"```(?:json)?\s*([\s\S]*?)```", content, re.IGNORECASE)
-    if fence:
-        content = fence.group(1).strip()
-    return content
+    return _strip_json_fence(content)
 
 
 def _local_embeddings(texts: list[str], dims: int = 256) -> list[list[float]]:

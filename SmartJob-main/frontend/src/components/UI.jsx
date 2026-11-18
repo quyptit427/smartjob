@@ -66,8 +66,8 @@ export function Resource({ resource, children, emptyTitle, emptyMessage }) {
     return <Empty title={emptyTitle} message={emptyMessage} />;
   return children(resource.data);
 }
-export function PageHeading({ eyebrow, title, description, action }) {
-  return (
+export function PageHeading({ eyebrow, title, description, action, band = false }) {
+  const heading = (
     <div className="page-heading">
       <div>
         {eyebrow && <div className="eyebrow">{eyebrow}</div>}
@@ -75,6 +75,12 @@ export function PageHeading({ eyebrow, title, description, action }) {
         {description && <p>{description}</p>}
       </div>
       {action}
+    </div>
+  );
+  if (!band) return heading;
+  return (
+    <div className="interior-hero">
+      <div className="container">{heading}</div>
     </div>
   );
 }
@@ -115,7 +121,7 @@ export function MatchBanner() {
           bạn.
         </p>
       </div>
-      <Link className="btn btn-white" to="/recommendations">
+      <Link className="btn btn-secondary" to="/recommendations">
         Khám phá gợi ý <ArrowRight size={17} />
       </Link>
     </div>

@@ -67,8 +67,9 @@ export default function Recruiter() {
     }
   }
   return (
-    <div className="container page-shell">
+    <div className="page-shell">
       <PageHeading
+        band
         eyebrow="KHÔNG GIAN NHÀ TUYỂN DỤNG"
         title="Tìm đồng đội tiếp theo."
         description="Quản lý tin tuyển dụng và kết nối với những ứng viên phù hợp."
@@ -78,6 +79,7 @@ export default function Recruiter() {
           </Link>
         }
       />
+      <div className="container page-body">
       <div className="dashboard-intro">
         <div>
           <BriefcaseBusiness size={25} />
@@ -172,6 +174,7 @@ export default function Recruiter() {
           </>
         )}
       </Resource>
+      </div>
     </div>
   );
 }

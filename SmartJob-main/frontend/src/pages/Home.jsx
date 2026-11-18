@@ -132,7 +132,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="intro-strip">
+      <section className="band-section">
         <div className="container intro-grid">
           <div>
             <span className="strip-icon" aria-hidden="true">
@@ -168,9 +168,7 @@ export default function Home() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">BƯỚC TIẾP THEO CỦA BẠN</span>
-            <h2>
-              Cơ hội mới, mỗi ngày<span className="text-blue-600">.</span>
-            </h2>
+            <h2>Cơ hội mới, mỗi ngày.</h2>
             <p>Khám phá những vị trí đang chờ một người như bạn.</p>
           </div>
           <Link className="text-link" to="/jobs">
@@ -192,46 +190,50 @@ export default function Home() {
         </Resource>
       </section>
 
-      <section className="container">
-        <MatchBanner />
+      <section className="band-section-blue">
+        <div className="container">
+          <MatchBanner />
+        </div>
       </section>
 
-      <section className="section container journey-section">
-        <div>
-          <span className="eyebrow">ĐƠN GIẢN ĐỂ BẮT ĐẦU</span>
-          <h2>
-            Chạm đến công việc mới
-            <br />
-            trong ba bước.
-          </h2>
-          <p>Để thời gian của bạn dành cho điều quan trọng: chuẩn bị cho một khởi đầu tốt hơn.</p>
-          <Link className="text-link" to={user ? '/profile' : '/register'}>
-            {user ? 'Hoàn thiện hồ sơ' : 'Tạo hồ sơ miễn phí'}{' '}
-            <ArrowRight size={17} aria-hidden="true" />
-          </Link>
-        </div>
-        <div className="journey-steps">
-          {[
-            ['01', 'Kể câu chuyện của bạn', 'Thêm kỹ năng, kinh nghiệm và vị trí bạn mong muốn.'],
-            [
-              '02',
-              'Khám phá cơ hội phù hợp',
-              'Tìm kiếm chủ động hoặc xem gợi ý kèm lý do phù hợp.',
-            ],
-            [
-              '03',
-              'Tự tin gửi lời ứng tuyển',
-              'Kết nối với nhà tuyển dụng và theo dõi hồ sơ dễ dàng.',
-            ],
-          ].map(([number, title, desc]) => (
-            <div className="journey-step" key={number}>
-              <span>{number}</span>
-              <div>
-                <h3>{title}</h3>
-                <p>{desc}</p>
+      <section className="band-section-lavender">
+        <div className="container section journey-section">
+          <div>
+            <span className="eyebrow">ĐƠN GIẢN ĐỂ BẮT ĐẦU</span>
+            <h2>
+              Chạm đến công việc mới
+              <br />
+              trong ba bước.
+            </h2>
+            <p>Để thời gian của bạn dành cho điều quan trọng: chuẩn bị cho một khởi đầu tốt hơn.</p>
+            <Link className="text-link" to={user ? '/profile' : '/register'}>
+              {user ? 'Hoàn thiện hồ sơ' : 'Tạo hồ sơ miễn phí'}{' '}
+              <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="journey-steps">
+            {[
+              ['01', 'Kể câu chuyện của bạn', 'Thêm kỹ năng, kinh nghiệm và vị trí bạn mong muốn.'],
+              [
+                '02',
+                'Khám phá cơ hội phù hợp',
+                'Tìm kiếm chủ động hoặc xem gợi ý kèm lý do phù hợp.',
+              ],
+              [
+                '03',
+                'Tự tin gửi lời ứng tuyển',
+                'Kết nối với nhà tuyển dụng và theo dõi hồ sơ dễ dàng.',
+              ],
+            ].map(([number, title, desc]) => (
+              <div className="journey-step" key={number}>
+                <span>{number}</span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{desc}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
     </>

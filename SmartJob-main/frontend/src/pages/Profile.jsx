@@ -283,8 +283,9 @@ export default function Profile() {
   }
 
   return (
-    <div className="container page-shell">
+    <div className="page-shell">
       <PageHeading
+        band
         eyebrow="KHÔNG GIAN CỦA BẠN"
         title={candidate ? 'Hồ sơ nghề nghiệp.' : 'Hồ sơ nhà tuyển dụng.'}
         description={
@@ -293,7 +294,9 @@ export default function Profile() {
             : 'Giới thiệu doanh nghiệp và cập nhật thông tin liên hệ.'
         }
       />
-      <div className="profile-layout">
+      
+      <div className="container page-body">
+<div className="profile-layout">
         <aside className="panel profile-summary">
           <span className="avatar large-avatar">{user.name.slice(0, 1).toUpperCase()}</span>
           <h2>{user.name}</h2>
@@ -667,6 +670,8 @@ export default function Profile() {
           </div>
         </form>
       </div>
-    </div>
+    
+      </div>
+</div>
   );
 }

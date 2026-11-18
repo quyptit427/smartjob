@@ -32,8 +32,9 @@ export default function Jobs({ recommended = false }) {
   }
 
   return (
-    <div className={`page-shell container ${recommended ? 'jobs-recommended' : ''}`}>
+    <div className={`page-shell ${recommended ? 'jobs-recommended' : ''}`}>
       <PageHeading
+        band
         eyebrow={recommended ? 'GỢI Ý DÀNH RIÊNG CHO BẠN' : 'KHÁM PHÁ CƠ HỘI'}
         title={recommended ? 'Công việc hợp với bạn.' : 'Tìm công việc tiếp theo.'}
         description={
@@ -50,6 +51,7 @@ export default function Jobs({ recommended = false }) {
         }
       />
 
+      <div className="container" style={{ paddingTop: '2rem' }}>
       {recommended ? (
         <div className="recommendation-explainer">
           <Sparkles size={20} aria-hidden="true" />
@@ -171,6 +173,7 @@ export default function Jobs({ recommended = false }) {
           </Link>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -25,18 +25,22 @@ export default function ApplicantManagement() {
     }
   }
   return (
-    <div className="container page-shell">
-      <Link className="back-link" to="/recruiter">
-        <ArrowLeft size={17} /> Quản lý tuyển dụng
-      </Link>
+    <div className="page-shell">
       <PageHeading
+        band
         eyebrow="KẾT NỐI VỚI ỨNG VIÊN"
         title="Hồ sơ ứng tuyển."
         description={job.data?.title || 'Xem thông tin ứng viên và cập nhật kết quả xét duyệt.'}
+        action={
+          <Link className="btn btn-secondary" to="/recruiter">
+            <ArrowLeft size={17} /> Quản lý tuyển dụng
+          </Link>
+        }
       />
-      <p className="snapshot-note">
-        Thông tin hiển thị là hồ sơ ứng viên tại thời điểm gửi đơn ứng tuyển.
-      </p>
+      <div className="container page-body">
+        <p className="snapshot-note">
+          Thông tin hiển thị là hồ sơ ứng viên tại thời điểm gửi đơn ứng tuyển.
+        </p>
       <Resource
         resource={resource}
         emptyTitle="Đang chờ những kết nối đầu tiên"
@@ -120,6 +124,8 @@ export default function ApplicantManagement() {
           </>
         )}
       </Resource>
-    </div>
+    
+      </div>
+</div>
   );
 }

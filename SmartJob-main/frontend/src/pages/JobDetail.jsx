@@ -41,36 +41,40 @@ export default function JobDetail() {
     }
   }
   return (
-    <div className="container page-shell">
-      <Link className="back-link" to="/jobs">
-        <ArrowLeft size={17} /> Tất cả việc làm
-      </Link>
+    <div className="page-shell">
       <Resource resource={resource}>
         {(job) => (
           <>
-            <div className="detail-heading panel">
-              <span className="company-logo blue large">
-                {job.companyName.slice(0, 2).toUpperCase()}
-              </span>
-              <div>
-                <span className={`status ${job.status}`}>
-                  {job.status === 'open' ? 'Đang tuyển dụng' : 'Đã đóng tuyển dụng'}
-                </span>
-                <h1>{job.title}</h1>
-                <p>{job.companyName}</p>
-                <div className="job-meta">
-                  <span>
-                    <MapPin size={15} />
-                    {job.location}
+            <div className="interior-hero">
+              <div className="container">
+                <Link className="back-link back-link-light" to="/jobs">
+                  <ArrowLeft size={17} /> Tất cả việc làm
+                </Link>
+                <div className="detail-heading detail-heading-hero">
+                  <span className="company-logo blue large">
+                    {job.companyName.slice(0, 2).toUpperCase()}
                   </span>
-                  <span>
-                    <CalendarDays size={15} />
-                    Đăng ngày {date(job.createdAt)}
-                  </span>
+                  <div>
+                    <span className={`status ${job.status}`}>
+                      {job.status === 'open' ? 'Đang tuyển dụng' : 'Đã đóng tuyển dụng'}
+                    </span>
+                    <h1>{job.title}</h1>
+                    <p>{job.companyName}</p>
+                    <div className="job-meta">
+                      <span>
+                        <MapPin size={15} />
+                        {job.location}
+                      </span>
+                      <span>
+                        <CalendarDays size={15} />
+                        Đăng ngày {date(job.createdAt)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="detail-layout">
+            <div className="container detail-layout" style={{ paddingTop: '2rem' }}>
               <div>
                 <section className="panel detail-content">
                   <h2>Mô tả công việc</h2>

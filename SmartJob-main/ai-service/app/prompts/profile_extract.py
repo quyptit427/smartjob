@@ -23,6 +23,13 @@ Trả đúng JSON:
   "links": {"linkedin": null, "github": null, "portfolio": null}
 }
 
-skills viết thường, ngắn. experience_years là số năm (float) ước lượng từ CV hoặc null.
+skills viết thường, ngắn.
+
+experience_years = số năm KINH NGHIỆM LÀM VIỆC chuyên môn (float), quy tắc:
+- Chỉ tính từ mục kinh nghiệm làm việc / internship / freelance có trong CV.
+- Cộng thời gian các vị trí làm việc (tháng → năm, ví dụ 6 tháng = 0.5).
+- Thực tập / intern / sinh viên / fresher mà chưa có việc chính thức: thường 0–0.5, KHÔNG lấy 1+.
+- KHÔNG lấy: năm học ("sinh viên năm 2/3/4"), thời lượng chương trình đào tạo ("cử nhân 4 năm"), năm lịch (2022, 2023), tuổi.
+- CV không ghi rõ thời gian làm việc → null (đừng đoán).
 Chỉ trả JSON, không markdown.
 """.strip()

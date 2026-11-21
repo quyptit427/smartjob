@@ -1,8 +1,5 @@
 from datetime import datetime, timedelta, timezone
 
-from pymongo import ASCENDING, MongoClient
-from pymongo.errors import PyMongoError
-
 from app.settings import settings
 
 _collection = None
@@ -14,14 +11,28 @@ def _collection_handle():
         return _collection
     if not settings.mongodb_uri:
         return None
-    client = MongoClient(settings.mongodb_uri, serverSelectionTimeoutMS=3000)
-    collection = client[settings.ai_db]["ai_messages"]
-    collection.create_index([("userId", ASCENDING), ("createdAt", ASCENDING)])
+    try:
+        from pymongo import ASCENDING, MongoClient
+        from pymongo.errors import PyMongoError
+    except ImportError:
+        print("chat history disabled: install pymongo from ai-service/requirements.txt")
+        return None
+    try:
+        client = MongoClient(settings.mongodb_uri, serverSelectionTimeoutMS=3000)
+        collection = client[settings.ai_db]["ai_messages"]
+        collection.create_index([("userId", ASCENDING), ("createdAt", ASCENDING)])
+    except PyMongoError as error:
+        print(f"chat history unavailable: {error}")
+        return None
     _collection = collection
     return collection
 
 
 def recent_turns(user_id: str, limit: int = 10) -> list[dict]:
+    try:
+        from pymongo.errors import PyMongoError
+    except ImportError:
+        return []
     try:
         collection = _collection_handle()
         if collection is None:
@@ -39,6 +50,10 @@ def recent_turns(user_id: str, limit: int = 10) -> list[dict]:
 
 
 def append_turn(user_id: str, question: str, answer: str) -> None:
+    try:
+        from pymongo.errors import PyMongoError
+    except ImportError:
+        return
     try:
         collection = _collection_handle()
         if collection is None:

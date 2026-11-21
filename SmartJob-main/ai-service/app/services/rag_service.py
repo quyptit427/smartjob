@@ -4,6 +4,7 @@ import unicodedata
 from collections.abc import Sequence
 
 from app.services.embedding_service import embed_job_texts, embed_query
+from app.settings import settings
 
 # Align with recommendation-service scoring.js (docs/04-recommendation.md):
 # MatchScore = round(40×S + 25×P + 20×E + 15×L)
@@ -445,16 +446,31 @@ async def retrieve_jobs(
 
     ranked = [score_job(profile, job) for job in jobs]
     # Soft semantic nudge only as a tiny tie-break among equal scores.
-    try:
-        query = f"{question}\n{profile.get('summary', '')}\n{' '.join(profile.get('skills') or [])}"[:4000]
-        query_vector = await embed_query(query)
-        job_texts = [job_document(item["job"]) for item in ranked]
-        vectors = await embed_job_texts(job_texts)
-        for item, vector in zip(ranked, vectors, strict=True):
-            item["semantic"] = cosine_similarity(query_vector, vector)
-    except Exception:
-        for item in ranked:
-            item["semantic"] = 0.0
+    semantic_from_index = False
+    query = f"{question}\n{profile.get('summary', '')}\n{' '.join(profile.get('skills') or [])}"[:4000]
+    if settings.vectorize_enabled:
+        try:
+            from app.services.vectorize_service import query_similar
+
+            query_vector = await embed_query(query)
+            hits = await query_similar(query_vector)
+            if hits:
+                by_id = {hit["id"]: hit["score"] for hit in hits}
+                for item in ranked:
+                    item["semantic"] = float(by_id.get(str(item["job"].get("_id")), 0.0))
+                semantic_from_index = True
+        except Exception:
+            semantic_from_index = False
+    if not semantic_from_index:
+        try:
+            query_vector = await embed_query(query)
+            job_texts = [job_document(item["job"]) for item in ranked]
+            vectors = await embed_job_texts(job_texts)
+            for item, vector in zip(ranked, vectors, strict=True):
+                item["semantic"] = cosine_similarity(query_vector, vector)
+        except Exception:
+            for item in ranked:
+                item["semantic"] = 0.0
 
     ranked.sort(key=_sort_key)
     _promote_if_no_high(ranked, high_limit)

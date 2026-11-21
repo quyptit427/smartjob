@@ -623,11 +623,16 @@ async def analyze_and_advise(
     cv_text: str,
     question: str,
     retrieved_jobs: list[dict],
+    history: list[dict] | None = None,
 ) -> dict:
     # Keep payload small — main latency driver on the remote model.
     context = {
         "cv_text": cv_text[:6000],
         "question": question[:400],
+        "history": [
+            {"role": item.get("role", "user"), "content": str(item.get("content", ""))[:500]}
+            for item in (history or [])[-10:]
+        ],
         "available_jobs": [
             {
                 "job_id": item["job"].get("_id"),

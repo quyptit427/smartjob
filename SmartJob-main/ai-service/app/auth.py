@@ -1,3 +1,4 @@
+import hmac
 import re
 
 import jwt
@@ -28,3 +29,10 @@ def candidate_id(request: Request) -> str:
     if not re.fullmatch(r"[a-fA-F0-9]{24}", user_id):
         raise HTTPException(status_code=401, detail="Phiên đăng nhập không hợp lệ.")
     return user_id
+
+
+def require_service(request: Request) -> None:
+    token = request.headers.get("x-service-token", "")
+    expected = settings.internal_service_token
+    if not expected or len(token) != len(expected) or not hmac.compare_digest(token, expected):
+        raise HTTPException(status_code=401, detail="Khóa dịch vụ không hợp lệ.")

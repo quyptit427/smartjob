@@ -1,0 +1,9 @@
+name = "smartjob-keepalive"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+[triggers]
+crons = ["*/10 * * * *"]
+
+[vars]
+API_HEALTH_URL = "https://smartjob-api.onrender.com/health"

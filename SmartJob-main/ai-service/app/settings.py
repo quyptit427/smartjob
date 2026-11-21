@@ -22,6 +22,15 @@ class Settings:
     openai_embedding_model = os.getenv(
         "OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"
     )
+    mongodb_uri = os.getenv("MONGODB_URI", "")
+    ai_db = os.getenv("AI_DB", "smartjob_ai")
+    cloudflare_account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID", "")
+    cloudflare_api_token = os.getenv("CLOUDFLARE_API_TOKEN", "")
+    vectorize_index = os.getenv("VECTORIZE_INDEX", "smartjob-jobs")
+
+    @property
+    def vectorize_enabled(self) -> bool:
+        return bool(self.cloudflare_account_id and self.cloudflare_api_token)
 
 
 settings = Settings()

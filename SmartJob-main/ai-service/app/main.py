@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from app.auth import candidate_id
+from app.auth import candidate_id, require_service
 from app.clients import fetch_open_jobs, fetch_resume
 from app.schemas.chat import (
     ChatEnvelope,
@@ -22,8 +22,10 @@ from app.services.llm_service import (
     extract_profile_from_cv,
     heuristic_profile,
 )
+from app.services.chat_store import append_turn, recent_turns
 from app.services.openai_client import AiProviderError
 from app.services.rag_service import profile_from_cv_model, rescore_matches, retrieve_jobs
+from app.services.vectorize_service import delete_job, upsert_jobs
 
 app = FastAPI(title="SmartJob AI Service", version="1.0.0")
 
@@ -74,6 +76,38 @@ async def health():
     return {"service": "ai-service", "status": "ok"}
 
 
+@app.post("/internal/vectors/jobs")
+async def index_job(request: Request):
+    require_service(request)
+    job = await request.json()
+    try:
+        count = await upsert_jobs([job])
+    except Exception as error:
+        raise HTTPException(status_code=503, detail="Chưa ghi được vector của tin tuyển dụng.") from error
+    return {"data": {"indexed": count}}
+
+
+@app.delete("/internal/vectors/jobs/{job_id}")
+async def remove_job_vector(job_id: str, request: Request):
+    require_service(request)
+    try:
+        await delete_job(job_id)
+    except Exception as error:
+        raise HTTPException(status_code=503, detail="Chưa xóa được vector của tin tuyển dụng.") from error
+    return {"data": {"deleted": job_id}}
+
+
+@app.post("/internal/vectors/reindex")
+async def reindex_jobs(request: Request):
+    require_service(request)
+    try:
+        jobs = await fetch_open_jobs()
+        count = await upsert_jobs(jobs)
+    except Exception as error:
+        raise HTTPException(status_code=503, detail="Chưa lập lại chỉ mục vector.") from error
+    return {"data": {"indexed": count}}
+
+
 @app.post("/api/ai/extract-profile", response_model=ExtractProfileEnvelope)
 async def extract_profile(request: Request):
     """Parse the candidate CV and return fields suitable for profile autofill."""
@@ -113,11 +147,15 @@ async def chat(body: ChatRequest, request: Request):
     user_id = candidate_id(request)
     try:
         # Parallel I/O; one compact LLM call afterward.
-        pdf_bytes, jobs = await asyncio.gather(fetch_resume(user_id), fetch_open_jobs())
+        pdf_bytes, jobs, history = await asyncio.gather(
+            fetch_resume(user_id),
+            fetch_open_jobs(),
+            asyncio.to_thread(recent_turns, user_id),
+        )
         cv_text = extract_cv_text(pdf_bytes)
         draft_profile = heuristic_profile(cv_text)
         matches = await retrieve_jobs(draft_profile, body.message, jobs)
-        advice = await analyze_and_advise(cv_text, body.message, matches)
+        advice = await analyze_and_advise(cv_text, body.message, matches, history)
         profile = CvProfile.model_validate(advice["profile"])
         merged_profile = profile_from_cv_model(profile, fallback=draft_profile)
         # Final priority uses LLM + heuristic profile and same 40/25/20/15 formula as recommendation-service.
@@ -196,9 +234,11 @@ async def chat(body: ChatRequest, request: Request):
             )
         )
 
+    answer = advice.get("answer", "Đây là các công việc có nội dung gần với hồ sơ của bạn.")
+    await asyncio.to_thread(append_turn, user_id, body.message, answer)
     return ChatEnvelope(
         data=ChatResponse(
-            answer=advice.get("answer", "Đây là các công việc có nội dung gần với hồ sơ của bạn."),
+            answer=answer,
             profile=profile,
             recommendations=recommendations,
         )

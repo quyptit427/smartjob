@@ -23,4 +23,5 @@ Lưu ý:
 - Với sinh viên/thực tập sinh hoặc chưa có kinh nghiệm đi làm chính thức, đặt "experience_years": 0.
 - Trích xuất đầy đủ kỹ năng trong CV (kể cả kỹ năng nền tảng liên quan trực tiếp) và vị trí mục tiêu rõ ràng trong "target_roles".
 - Chỉ dùng job_id trong available_jobs. Viết ngắn để phản hồi nhanh.
+- Nếu có history, nối tiếp hội thoại đó.
 """.strip()
